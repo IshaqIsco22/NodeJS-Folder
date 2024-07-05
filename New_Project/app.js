@@ -2,6 +2,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const categories = require("./Routes/categories");
 const students = require("./Routes/students");
+const courses = require("./Routes/Courses")
 const app = express();
 
 mongoose
@@ -14,7 +15,7 @@ mongoose
 app.use(express.json());
 app.use("/api/categories",categories);
 app.use( "/api/students",students)
-
+app.use("/api/courses",courses)
 
 
 

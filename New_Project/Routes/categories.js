@@ -1,17 +1,6 @@
 const express = require("express");
-const mongoose = require("mongoose");
-const Joi = require("joi");
-
-
+const {Category, validate} = require("../models/categoriesModel")
 const router = express.Router();
-
-// const { schema } = require("joi/lib/types/object");
-
-const categorySchema = mongoose.Schema({
-  name: { type: String, required: true, minLength: 3, maxLength: 30 },
-});
-
-const Category = mongoose.model("Category", categorySchema);
 
 router.get("/", async (req, res) => {
   let categories = await Category.find();
@@ -19,7 +8,7 @@ router.get("/", async (req, res) => {
 });
 
 router.post("/", async (req, res) => {
-  const { error } = validateData(req.body);
+  const { error } = validate(req.body);
   if (error) {
     res.status(400).send(error.details[0].message);
   }
@@ -31,7 +20,7 @@ router.post("/", async (req, res) => {
 });
 
 router.put("/:id", async (req, res) => {
-  const { error } = validateData(req.body);
+  const { error } = validate(req.body);
   if (error) res.status(400).send(error.details[0].message);
   const category = await Category.findByIdAndUpdate(
     req.params.id,
@@ -58,12 +47,5 @@ router.get("/:id", async (req, res) => {
     return res.status(404).send("The category with the given ID was not found");
   res.send(category);
 });
-
-function validateData(category) {
-  const schema = {
-    name: Joi.string().min(3).required(),
-  };
-  return Joi.validate(category, schema);
-}
 
 module.exports = router;

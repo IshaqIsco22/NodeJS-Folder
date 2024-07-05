@@ -1,17 +1,7 @@
 const express = require("express");
-const mongoose = require("mongoose");
+const { Student, validate } = require("../models/studentsModel");
 
 const router = express.Router();
-
-const Joi = require("joi");
-
-const studentSchema = mongoose.Schema({
-  name: { type: String, required: true, minLength: 3, maxLength: 30 },
-  isEnrolled: { type: Boolean, default: false },
-  Phone: { type: String, required: true, minLength: 10, maxLength: 20 },
-});
-
-const Student = mongoose.model("Student", studentSchema);
 
 router.get("/api/students", async (req, res) => {
   let students = await Student.find();
@@ -19,7 +9,7 @@ router.get("/api/students", async (req, res) => {
 });
 
 router.post("/", async (req, res) => {
-  const { error } = validateData(req.body);
+  const { error } = validate(req.body);
   if (error) {
     res.status(400).send(error.details[0].message);
   }
@@ -33,7 +23,7 @@ router.post("/", async (req, res) => {
 });
 
 router.put("/:id", async (req, res) => {
-  const { error } = validateData(req.body);
+  const { error } = validate(req.body);
   if (error) res.status(400).send(error.details[0].message);
   const student = await Student.findByIdAndUpdate(
     req.params.id,
@@ -62,14 +52,5 @@ router.get("/:id", async (req, res) => {
     return res.status(404).send("The student with the given ID was not found");
   res.send(student);
 });
-
-function validateData(student) {
-  const schema = {
-    name: Joi.string().min(3).max(50).required(),
-    Phone:Joi.string().min(10).max(50).required(),
-    isEnrolled: Joi.boolean(),
-  };
-  return Joi.validate(student, schema);
-}
 
 module.exports = router;
